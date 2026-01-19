@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root{
+  --bg: 248 250 252;         /* slate-50 */
+  --surface: 255 255 255;    /* white */
+  --ink: 10 10 12;           /* near-black */
+  --muted: 100 116 139;      /* slate-500 */
+  --line: 226 232 240;       /* slate-200 */
+  --sidebar: 11 11 14;       /* deep black */
+  --sidebar2: 17 17 21;      /* slightly lighter */
+  --bronze: 197 151 96;      /* bronze */
+  --bronze2: 164 114 63;     /* bronze dark */
+}
+
+html, body { height: 100%; }
+body { margin: 0; background: rgb(var(--bg)); color: rgb(var(--ink)); }
