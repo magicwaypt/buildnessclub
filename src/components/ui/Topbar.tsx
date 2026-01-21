@@ -8,24 +8,8 @@ export function Topbar() {
   return (
     <header className="sticky top-0 z-30 bg-white border-b border-[rgb(var(--line))]">
       <div className="h-16 px-8 flex items-center justify-between">
-        <div className="flex items-center gap-4 min-w-0">
-          <div className="text-[11px] font-semibold tracking-[0.22em] text-slate-500">
-            INTRANET
-          </div>
-          <div className="hidden lg:block h-4 w-px bg-[rgb(var(--line))]" />
-          <div className="hidden lg:block text-sm text-slate-700">
-            Bem-vindo ao Buildness Club. O que pretende fazer hoje?
-          </div>
-        </div>
-
-        <div className="hidden md:flex items-center gap-3 w-[520px] max-w-[50vw] border border-[rgb(var(--line))] bg-slate-50 px-4 py-2">
-          <span className="text-slate-400 text-sm">⌘</span>
-          <input
-            placeholder="Pesquisar: eventos, empresas, oportunidades…"
-            className="w-full bg-transparent outline-none text-sm text-slate-700 placeholder:text-slate-400"
-          />
-          <div className="h-4 w-px bg-[rgb(var(--line))]" />
-          <span className="text-xs text-slate-500">K</span>
+        <div className="text-[11px] font-semibold tracking-[0.22em] text-slate-500">
+          INTRANET
         </div>
 
         <div className="flex items-center gap-3">

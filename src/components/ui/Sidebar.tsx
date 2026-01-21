@@ -1,7 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 const nav = [
   { href: "/dashboard", label: "Início", icon: HomeIcon },
@@ -15,17 +17,42 @@ const nav = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const [collapsed, setCollapsed] = useState(false);
+
+  const widthClass = collapsed ? "w-[72px]" : "w-[240px]";
+  const navPaddingClass = collapsed ? "px-1" : "px-2 md:px-3";
+  const labelClass = collapsed ? "hidden" : "inline-flex flex-1";
+  const headerContentClass = collapsed ? "hidden" : "hidden md:flex flex-col gap-2";
 
   return (
-    <aside className="w-[72px] md:w-[240px] shrink-0 bg-[rgb(var(--sidebar))] text-white border-r border-white/10">
+    <aside
+      className={`${widthClass} shrink-0 bg-[rgb(var(--sidebar))] text-white border-r border-white/10 transition-all duration-200`}
+    >
       <div className="h-full flex flex-col">
-        <div className="px-4 py-6 border-b border-white/10">
-          <div className="hidden md:block text-sm font-semibold tracking-tight">Buildness</div>
-          <div className="hidden md:block text-xs text-white/60 mt-1">Intranet</div>
-          <div className="mx-auto md:mx-0 mt-2 md:mt-4 h-[2px] w-10 md:w-14 bg-[rgb(var(--bronze))]" />
+        <div className="px-4 py-6 border-b border-white/10 flex items-center justify-between gap-3">
+          <div className={headerContentClass}>
+            <div className="h-16 w-full">
+              <Image
+                src="/buildness-club-logo.png"
+                alt="Buildness Club"
+                width={280}
+                height={112}
+                className="h-[3.75rem] w-auto md:h-16"
+                priority
+              />
+            </div>
+          </div>
+          <button
+            onClick={() => setCollapsed((prev) => !prev)}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition hover:bg-white/10"
+            aria-label={collapsed ? "Expandir menu" : "Colapsar menu"}
+          >
+            <ChevronIcon direction={collapsed ? "right" : "left"} className="h-4 w-4" />
+          </button>
         </div>
+        <div className="mx-auto md:mx-0 h-[2px] w-10 md:w-14 bg-[rgb(var(--bronze))]" />
 
-        <nav className="px-2 md:px-3 py-4 space-y-1">
+        <nav className={`${navPaddingClass} py-4 space-y-1`}>
           {nav.map((item) => {
             const isActive =
               pathname === item.href || pathname.startsWith(`${item.href}/`);
@@ -57,20 +84,26 @@ export function Sidebar() {
                     ].join(" ")}
                   />
                 </span>
-                <span className="hidden md:inline-flex flex-1">{item.label}</span>
-                {isActive && (
-                  <span className="hidden md:inline-flex h-1.5 w-1.5 rounded-full bg-[rgb(var(--bronze))]" />
+                <span className={labelClass}>{item.label}</span>
+                {isActive && !collapsed && (
+                  <span className="h-1.5 w-1.5 rounded-full bg-[rgb(var(--bronze))]" />
                 )}
               </Link>
             );
           })}
         </nav>
 
-        <div className="mt-auto px-4 py-6 border-t border-white/10">
-          <button className="w-full px-3 py-3 text-sm font-medium bg-[rgb(var(--sidebar2))] hover:bg-white/10 border border-white/10 transition">
-            <span className="hidden md:inline">Convidar membro</span>
-            <span className="md:hidden">+</span>
+        <div className={`${navPaddingClass} mt-3`}>
+          <button className="w-full rounded-2xl border border-white/20 bg-white/5 px-3 py-3 text-sm font-semibold text-white transition hover:bg-white/10">
+            <span className={labelClass}>Convidar membro</span>
+            {collapsed && (
+              <span className="sr-only">Convidar membro</span>
+            )}
           </button>
+        </div>
+
+        <div className="mt-auto px-4 py-6 border-t border-white/10 space-y-3">
+          <div className="h-1" />
         </div>
       </div>
     </aside>
@@ -180,6 +213,28 @@ function BellIcon({ className = "" }: { className?: string }) {
     >
       <path d="M6 9a6 6 0 0 1 12 0v4l2 2H4l2-2z" />
       <path d="M9.5 19a2.5 2.5 0 0 0 5 0" />
+    </svg>
+  );
+}
+
+function ChevronIcon({
+  direction = "left",
+  className = "",
+}: {
+  direction?: "left" | "right";
+  className?: string;
+}) {
+  return (
+    <svg
+      className={`${className} ${direction === "left" ? "rotate-180" : ""}`}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M9 6l6 6-6 6" />
     </svg>
   );
 }

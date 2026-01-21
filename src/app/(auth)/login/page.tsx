@@ -1,27 +1,13 @@
 "use client";
 
-import { useMemo, useState, type FormEvent } from "react";
-
-type Company = { name: string; logo: string };
+import Image from "next/image";
+import { useState, type FormEvent } from "react";
+import { CompanyMarquee } from "@/components/ui/CompanyMarquee";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const companies: Company[] = useMemo(
-    () => [
-      { name: "NovaMétrica", logo: "NM" },
-      { name: "Maré Verde", logo: "MV" },
-      { name: "AtlasTech", logo: "AT" },
-      { name: "Sinal Aberto", logo: "SA" },
-      { name: "Grupo 4C", logo: "4C" },
-      { name: "BluePeak", logo: "BP" },
-      { name: "Vértice", logo: "V" },
-      { name: "NorteLab", logo: "NL" },
-    ],
-    []
-  );
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -168,42 +154,10 @@ export default function LoginPage() {
                 </div>
               </form>
 
-              <div className="border-t border-[rgb(var(--line))] bg-slate-50">
-                <div className="px-6 py-3 flex items-center justify-between">
-                  <div className="text-[11px] font-semibold tracking-[0.22em] text-slate-500">
-                    EMPRESAS MEMBROS (EXEMPLO)
-                  </div>
-                  <div className="h-[2px] w-10 bg-[rgb(var(--bronze))]" />
-                </div>
-
-                <div className="relative overflow-hidden">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-slate-50 to-transparent" />
-                  <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-slate-50 to-transparent" />
-
-                  <div className="marquee py-4">
-                    <div className="marquee__track">
-                      {[...companies, ...companies].map((c, idx) => (
-                        <div
-                          key={`${c.name}-${idx}`}
-                          className="flex items-center gap-3 border border-[rgb(var(--line))] bg-white px-4 py-3"
-                        >
-                          <div className="h-10 w-10 rounded-full grid place-items-center bg-[rgb(var(--ink))] text-white text-xs font-semibold border border-[rgb(var(--bronze))]">
-                            {c.logo}
-                          </div>
-                          <div className="leading-tight">
-                            <div className="text-sm font-semibold text-slate-900">{c.name}</div>
-                            <div className="text-xs text-slate-500">Membro do clube</div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="px-6 pb-5 text-xs text-slate-500">
-                  Ao entrar, concorda com as regras do clube e com a confidencialidade entre membros.
-                </div>
-              </div>
+              <CompanyMarquee
+                heading="EMPRESAS MEMBROS (EXEMPLO)"
+                caption="Ao entrar, concorda com as regras do clube e com a confidencialidade entre membros."
+              />
             </div>
 
             <div className="lg:hidden mt-6 border border-[rgb(var(--line))] bg-white px-5 py-4">
@@ -217,23 +171,6 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <style jsx global>{`
-        .marquee__track {
-          display: flex;
-          gap: 14px;
-          width: max-content;
-          animation: marquee 22s linear infinite;
-          padding-left: 24px;
-          padding-right: 24px;
-        }
-        @keyframes marquee {
-          from { transform: translateX(0); }
-          to { transform: translateX(calc(-50%)); }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .marquee__track { animation: none; }
-        }
-      `}</style>
     </div>
   );
 }

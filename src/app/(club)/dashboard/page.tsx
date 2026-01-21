@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CompanyMarquee } from "@/components/ui/CompanyMarquee";
 
 type Member = {
   name: string;
@@ -55,6 +56,33 @@ function BronzePill({ children }: { children: React.ReactNode }) {
   );
 }
 
+type ArrowVariant = "default" | "white";
+
+function ArrowLink({
+  href = "#",
+  variant = "default",
+  children,
+}: {
+  href?: string;
+  variant?: ArrowVariant;
+  children: React.ReactNode;
+}) {
+  const base = "inline-flex items-center gap-1 text-sm font-semibold transition";
+  const variantClass =
+    variant === "white"
+      ? "text-white/90 hover:text-white"
+      : "text-slate-500 hover:text-slate-700";
+
+  return (
+    <Link href={href} className={`${base} ${variantClass}`}>
+      {children}
+      <span aria-hidden="true" className="text-sm">
+        →
+      </span>
+    </Link>
+  );
+}
+
 function StatusPill({ status }: { status: ActionItem["status"] }) {
   const base =
     "inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em]";
@@ -73,17 +101,19 @@ function Card({
   title,
   right,
   icon,
+  secondaryLink,
   children,
 }: {
   eyebrow: string;
   title: string;
   right?: React.ReactNode;
   icon?: React.ReactNode;
+  secondaryLink?: { href: string; label: string; variant?: ArrowVariant };
   children: React.ReactNode;
 }) {
   return (
     <section className="rounded-3xl border border-[rgb(var(--line))] bg-white shadow-sm">
-      <header className="px-6 py-5 border-b border-[rgb(var(--line))] flex items-start justify-between gap-4">
+      <header className="px-6 py-5 border-b border-[rgb(var(--line))] flex flex-col gap-2">
         <div className="flex items-start gap-4">
           {icon && (
             <span className="grid h-11 w-11 place-items-center rounded-2xl bg-[rgb(var(--ink))] text-white shadow-sm">
@@ -100,6 +130,13 @@ function Card({
           </div>
         </div>
         {right}
+        {secondaryLink && (
+          <div className="pt-1">
+            <ArrowLink href={secondaryLink.href} variant={secondaryLink.variant}>
+              {secondaryLink.label}
+            </ArrowLink>
+          </div>
+        )}
       </header>
       <div className="p-6">{children}</div>
     </section>
@@ -227,6 +264,20 @@ export default function DashboardPage() {
     industry: "Energia & Procurement",
     region: "Lisboa",
   };
+
+  const stats = [
+    { label: "Actividades pendentes", value: "9", href: "/actividades" },
+    { label: "Negociações em curso", value: "6", href: "/negociacoes" },
+    { label: "Tópicos em discussão", value: "14", href: "/forum" },
+    { label: "Novas sugestões", value: "5", href: "/sugestoes" },
+  ];
+
+  const planBorder = {
+    Free: "border-slate-300 bg-white text-slate-700",
+    Pro: "border-[#c59b60] bg-[#fdf6ec] text-[#8c5f33]",
+    Executive: "border-[#1f2c44] bg-white text-[#1f2c44]",
+    Investor: "border-[#6b4d85] bg-white text-[#6b4d85]",
+  } as const;
 
   const membersRecent: Member[] = [
     {
@@ -361,13 +412,11 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      <CompanyMarquee caption="Empresas parceiras ativas e novas entradas no ecossistema do clube." />
       {/* Page header */}
       <div className="border border-[rgb(var(--line))] bg-white">
-        <div className="px-6 py-6 flex items-start justify-between gap-6">
+        <div className="px-6 py-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>
-            <div className="text-[11px] font-semibold tracking-[0.22em] text-slate-500">
-              INTRANET
-            </div>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">
               Resumo semanal
             </h1>
@@ -377,7 +426,7 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          <div className="hidden md:flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <BronzePill>Plano {me.plan}</BronzePill>
             <Badge>{me.industry}</Badge>
             <Badge>{me.region}</Badge>
@@ -386,51 +435,74 @@ export default function DashboardPage() {
         <div className="h-[2px] bg-[linear-gradient(90deg,rgba(197,151,96,0.0),rgba(197,151,96,1),rgba(197,151,96,0.0))]" />
       </div>
 
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {stats.map((stat) => (
+          <section
+            key={stat.label}
+            className="rounded-2xl border border-transparent bg-[rgb(var(--bronze))] p-5 text-white shadow-sm"
+          >
+            <div className="text-xs font-semibold uppercase tracking-[0.3em] text-white/70">
+              {stat.label}
+            </div>
+            <div className="mt-3 text-3xl font-semibold">{stat.value}</div>
+            <div className="mt-1">
+              <ArrowLink href={stat.href} variant="white">
+                Ver mais
+              </ArrowLink>
+            </div>
+          </section>
+        ))}
+      </div>
+
       {/* Grid layout */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
-        {/* LEFT column */}
-        <div className="xl:col-span-4 space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Column 1 */}
+        <div className="space-y-6">
           {/* Members */}
           <Card
             eyebrow="MEMBROS RECENTES"
             title="Novas entradas relevantes"
             icon={<UsersIcon />}
-            right={<Link className="text-sm font-semibold text-slate-700 hover:underline" href="/membros">Ver todos</Link>}
+            secondaryLink={{ href: "/membros", label: "Ver todos" }}
           >
-            <div className="space-y-4">
-              {membersRecent.map((m, idx) => (
-                <div key={m.name}>
-                  <div className="flex items-center justify-between gap-4">
+            <div className="space-y-3">
+              {membersRecent.map((m) => (
+                <article
+                  key={m.name}
+                  className="rounded-2xl border border-[rgb(var(--line))] bg-white px-4 py-4 shadow-sm"
+                >
+                  <div className="flex items-start justify-between gap-4">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="h-10 w-10 rounded-full grid place-items-center bg-[rgb(var(--ink))] text-white text-xs font-semibold border border-[rgb(var(--bronze))]">
-                        {m.initials}
+                      <div className="relative flex-shrink-0">
+                        <div
+                          className={`h-12 w-12 rounded-full border text-sm font-semibold flex items-center justify-center shadow-sm ${planBorder[m.plan]}`}
+                        >
+                          {m.initials}
+                        </div>
+                        <span className="absolute -bottom-1 -right-1 flex h-5 items-center justify-center rounded-full border border-white bg-white px-2 py-0.5 text-[10px] font-semibold uppercase text-slate-600 shadow-sm">
+                          {m.plan}
+                        </span>
                       </div>
                       <div className="min-w-0">
-                        <div className="text-sm font-semibold text-slate-900 truncate">
+                        <div className="text-sm font-semibold text-slate-900">
                           {m.name} · {m.role}
                         </div>
-                        <div className="text-xs text-slate-500 truncate">
+                        <div className="text-xs text-slate-500">
                           {m.company} · {m.industry} · {m.region}
                         </div>
                       </div>
                     </div>
-
-                    <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-600 border border-[rgb(var(--line))] bg-slate-100/80 px-2.5 py-1 rounded-full">
-                      {m.plan}
-                    </span>
                   </div>
 
-                  <div className="mt-3 flex items-center gap-2">
-                    <button className="rounded-xl px-4 py-2.5 text-sm font-semibold bg-[rgb(var(--bronze))] text-white shadow-sm hover:opacity-90 transition">
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <button className="flex-1 rounded-xl border border-transparent bg-[rgb(var(--bronze))] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:opacity-90 sm:flex-none">
                       Pedir introdução
                     </button>
-                    <button className="rounded-xl px-4 py-2.5 text-sm font-semibold border border-[rgb(var(--line))] bg-white hover:bg-slate-50 transition">
+                    <button className="flex-1 rounded-xl border border-[rgb(var(--line))] bg-white px-4 py-2 text-sm font-semibold text-slate-900 transition hover:bg-slate-50 sm:flex-none">
                       Ver perfil
                     </button>
                   </div>
-
-                  {idx < membersRecent.length - 1 && <div className="mt-4"><Divider /></div>}
-                </div>
+                </article>
               ))}
             </div>
           </Card>
@@ -454,16 +526,16 @@ export default function DashboardPage() {
 
               <div className="pt-3 flex items-center justify-between">
                 <div className="text-xs text-slate-500">{industryInsight.source}</div>
-                <button className="text-sm font-semibold text-slate-700 hover:underline">
+                <ArrowLink href="/relatorio">
                   Ver relatório
-                </button>
+                </ArrowLink>
               </div>
             </div>
           </Card>
         </div>
 
-        {/* CENTER column */}
-        <div className="xl:col-span-5 space-y-6">
+        {/* Column 2 */}
+        <div className="space-y-6">
           {/* Highlight / hero */}
           <section className="border border-[rgb(var(--line))] bg-white overflow-hidden">
             <div className="px-6 py-5 border-b border-[rgb(var(--line))] flex items-start justify-between">
@@ -488,10 +560,10 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <button className="rounded-xl px-4 py-2.5 text-sm font-semibold bg-[rgb(var(--bronze))] text-white shadow-sm hover:opacity-90 transition">
+                  <button className="rounded-xl px-4 py-2 text-sm font-semibold bg-[rgb(var(--bronze))] text-white shadow-sm hover:opacity-90 transition">
                     Ver detalhes
                   </button>
-                  <button className="rounded-xl px-4 py-2.5 text-sm font-semibold border border-[rgb(var(--line))] bg-white hover:bg-slate-50 transition">
+                  <button className="rounded-xl px-4 py-2 text-sm font-semibold border border-[rgb(var(--line))] bg-white hover:bg-slate-50 transition">
                     Abrir agenda
                   </button>
                 </div>
@@ -523,7 +595,7 @@ export default function DashboardPage() {
                       </div>
                     </div>
 
-                    <button className="rounded-xl px-4 py-2.5 text-sm font-semibold border border-[rgb(var(--line))] bg-white hover:bg-slate-50 transition shrink-0">
+                  <button className="rounded-xl px-4 py-2 text-sm font-semibold border border-[rgb(var(--line))] bg-white hover:bg-slate-50 transition shrink-0">
                       Seguir
                     </button>
                   </div>
@@ -547,26 +619,25 @@ export default function DashboardPage() {
                   key={a.title}
                   className="border border-[rgb(var(--line))] bg-slate-50 p-4"
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <div className="text-sm font-semibold text-slate-900">
-                        {a.title}
-                      </div>
-                      <div className="mt-1 text-sm text-slate-600">
-                        {a.detail}
-                      </div>
+                  <div>
+                    <div className="text-sm font-semibold text-slate-900">
+                      {a.title}
                     </div>
-
-                    <StatusPill status={a.status} />
+                    <div className="mt-1 text-sm text-slate-600">
+                      {a.detail}
+                    </div>
                   </div>
 
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <button className="rounded-xl px-4 py-2.5 text-sm font-semibold bg-[rgb(var(--bronze))] text-white shadow-sm hover:opacity-90 transition">
-                      Executar agora
-                    </button>
-                    <button className="rounded-xl px-4 py-2.5 text-sm font-semibold border border-[rgb(var(--line))] bg-white hover:bg-slate-50 transition">
-                      Mais tarde
-                    </button>
+                  <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex flex-wrap gap-2">
+                      <button className="rounded-xl px-4 py-2 text-sm font-semibold bg-[rgb(var(--bronze))] text-white shadow-sm hover:opacity-90 transition">
+                        Executar agora
+                      </button>
+                      <button className="rounded-xl px-4 py-2 text-sm font-semibold border border-[rgb(var(--line))] bg-white hover:bg-slate-50 transition">
+                        Mais tarde
+                      </button>
+                    </div>
+                    <StatusPill status={a.status} />
                   </div>
                 </div>
               ))}
@@ -574,14 +645,14 @@ export default function DashboardPage() {
           </Card>
         </div>
 
-        {/* RIGHT column */}
-        <div className="xl:col-span-3 space-y-6">
+        {/* Column 3 */}
+        <div className="space-y-6">
           {/* Opportunities */}
           <Card
             eyebrow="NEGOCIAÇÕES"
             title="Oportunidades recomendadas"
             icon={<DealIcon />}
-            right={<Link className="text-sm font-semibold text-slate-700 hover:underline" href="/negociacoes">Ver todas</Link>}
+            right={<ArrowLink href="/negociacoes">Ver todas</ArrowLink>}
           >
             <div className="space-y-4">
               {opportunities.map((o, idx) => (
@@ -605,10 +676,10 @@ export default function DashboardPage() {
                   </div>
 
                   <div className="mt-3 flex items-center gap-2">
-                    <button className="rounded-xl px-4 py-2.5 text-sm font-semibold bg-[rgb(var(--bronze))] text-white shadow-sm hover:opacity-90 transition">
+                    <button className="rounded-xl px-4 py-2 text-sm font-semibold bg-[rgb(var(--bronze))] text-white shadow-sm hover:opacity-90 transition">
                       {o.cta}
                     </button>
-                    <button className="rounded-xl px-4 py-2.5 text-sm font-semibold border border-[rgb(var(--line))] bg-white hover:bg-slate-50 transition">
+                    <button className="rounded-xl px-4 py-2 text-sm font-semibold border border-[rgb(var(--line))] bg-white hover:bg-slate-50 transition">
                       Guardar
                     </button>
                   </div>
@@ -664,10 +735,10 @@ export default function DashboardPage() {
                   Isto activa respostas do ecossistema e ajuda a gerar ligações úteis rapidamente.
                 </div>
                 <div className="mt-3 flex gap-2">
-                  <button className="rounded-xl px-4 py-2.5 text-sm font-semibold bg-[rgb(var(--bronze))] text-white shadow-sm hover:opacity-90 transition">
+                  <button className="rounded-xl px-4 py-2 text-sm font-semibold bg-[rgb(var(--bronze))] text-white shadow-sm hover:opacity-90 transition">
                     Publicar pedido
                   </button>
-                  <button className="rounded-xl px-4 py-2.5 text-sm font-semibold border border-[rgb(var(--line))] bg-white hover:bg-slate-50 transition">
+                  <button className="rounded-xl px-4 py-2 text-sm font-semibold border border-[rgb(var(--line))] bg-white hover:bg-slate-50 transition">
                     Ver exemplos
                   </button>
                 </div>

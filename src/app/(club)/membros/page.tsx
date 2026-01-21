@@ -58,6 +58,13 @@ const insights = [
   { label: "Conversas ativas", value: "57" },
 ];
 
+const planBorder = {
+  Free: "border-slate-300 bg-white text-slate-700",
+  Pro: "border-[#c59b60] bg-[#fdf6ec] text-[#8c5f33]",
+  Executive: "border-[#1f2c44] bg-white text-[#1f2c44]",
+  Investor: "border-[#6b4d85] bg-white text-[#6b4d85]",
+} as const;
+
 function Tag({ children }: { children: React.ReactNode }) {
   return (
     <span className="inline-flex items-center rounded-full border border-[rgb(var(--line))] bg-slate-100/80 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-600">
@@ -115,8 +122,16 @@ export default function MembrosPage() {
                   <div className="rounded-2xl border border-[rgb(var(--line))] bg-slate-50 p-5">
                     <div className="flex flex-wrap items-start justify-between gap-4">
                       <div className="flex items-start gap-4 min-w-0">
-                        <div className="h-12 w-12 rounded-full grid place-items-center bg-[rgb(var(--ink))] text-white text-xs font-semibold border border-[rgb(var(--bronze))]">
-                          {member.initials}
+                        <div className="relative">
+                          <div
+                            className={`h-12 w-12 rounded-full border text-sm font-semibold flex items-center justify-center shadow-sm ${planBorder[member.plan as keyof typeof planBorder]
+                              ?? planBorder.Free}`}
+                          >
+                            {member.initials}
+                          </div>
+                          <span className="absolute -bottom-1 -right-1 flex h-5 items-center justify-center rounded-full border border-white bg-white px-2 py-0.5 text-[10px] font-semibold uppercase text-slate-600 shadow-sm">
+                            {member.plan}
+                          </span>
                         </div>
                         <div className="min-w-0">
                           <div className="text-sm font-semibold text-slate-900">
